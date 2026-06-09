@@ -86,7 +86,23 @@ function render() {
     return column;
   });
 
-  categories.forEach((category, categoryIndex) => {
+  const layout = {
+    "Venda": 0,
+    "Iluminação": 0,
+    "Parte Interna": 0,
+    "Parte Externa": 1,
+    "Pinturas e Decals": 2
+  };
+
+  const orderedCategories = [
+    "Venda",
+    "Iluminação",
+    "Parte Interna",
+    "Parte Externa",
+    "Pinturas e Decals"
+  ].map((name) => categories.find((category) => category.name === name));
+
+  orderedCategories.forEach((category) => {
     const card = document.createElement("article");
     card.className = "categoria";
 
@@ -150,7 +166,7 @@ function render() {
       card.appendChild(row);
     });
 
-    const columnIndex = [0, 1, 2, 0, 1][categoryIndex] || 0;
+    const columnIndex = layout[category.name] || 0;
     columns[columnIndex].appendChild(card);
   });
 }
