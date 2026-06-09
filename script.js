@@ -79,8 +79,14 @@ function productId(categoryName, productName) {
 
 function render() {
   categoriesElement.innerHTML = "";
+  const columns = [0, 1, 2].map(() => {
+    const column = document.createElement("div");
+    column.className = "coluna-categoria";
+    categoriesElement.appendChild(column);
+    return column;
+  });
 
-  categories.forEach((category) => {
+  categories.forEach((category, categoryIndex) => {
     const card = document.createElement("article");
     card.className = "categoria";
 
@@ -144,7 +150,8 @@ function render() {
       card.appendChild(row);
     });
 
-    categoriesElement.appendChild(card);
+    const columnIndex = [0, 1, 2, 0, 1][categoryIndex] || 0;
+    columns[columnIndex].appendChild(card);
   });
 }
 

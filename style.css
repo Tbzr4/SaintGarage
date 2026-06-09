@@ -51,6 +51,12 @@ input {
   align-items: start;
 }
 
+.coluna-categoria {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
 .categoria {
   min-width: 0;
   padding: 14px;
