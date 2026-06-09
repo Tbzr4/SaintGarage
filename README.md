@@ -1,4 +1,4 @@
-# Calculadora Shift Garage
+# Calculadora Saint Garage
 
 Calculadora em HTML, CSS e JavaScript puro, pronta para publicar no GitHub Pages.
 
@@ -19,7 +19,7 @@ Calculadora em HTML, CSS e JavaScript puro, pronta para publicar no GitHub Pages
 Abra `script.js` e troque esta linha:
 
 ```js
-const PARTNER_DISCOUNT_PERCENT = 0;
+const PARTNER_DISCOUNT_PERCENT = 15;
 ```
 
 Exemplo para 10%:

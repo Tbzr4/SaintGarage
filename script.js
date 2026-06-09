@@ -1,4 +1,4 @@
-const PARTNER_DISCOUNT_PERCENT = 0;
+const PARTNER_DISCOUNT_PERCENT = 15;
 
 const categories = [
   {
