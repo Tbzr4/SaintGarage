@@ -15,17 +15,24 @@
     <section id="categorias" class="categorias" aria-label="Categorias de produtos"></section>
 
     <footer class="resumo">
+      <div class="acoes-resumo">
+        <label class="parceria">
+          <input id="vendaParceria" type="checkbox" />
+          <span>Venda para parceria</span>
+        </label>
+
+        <button id="resetar" class="resetar" type="button">RESETAR</button>
+      </div>
+
+      <label class="tunagem">
+        <span>Tunagem e Customização</span>
+        <input id="tunagemCustomizacao" type="number" min="0" step="0.01" placeholder="R$ 0,00" />
+      </label>
+
       <div class="total-linha">
         <span>Valor total:</span>
         <strong id="valorTotal">R$ 0,00</strong>
       </div>
-
-      <label class="parceria">
-        <input id="vendaParceria" type="checkbox" />
-        <span>Venda para parceria</span>
-      </label>
-
-      <button id="resetar" class="resetar" type="button">RESETAR</button>
     </footer>
   </main>
 

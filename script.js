@@ -77,6 +77,7 @@ const categoriesElement = document.getElementById("categorias");
 const totalElement = document.getElementById("valorTotal");
 const partnerCheckbox = document.getElementById("vendaParceria");
 const resetButton = document.getElementById("resetar");
+const tuningInput = document.getElementById("tunagemCustomizacao");
 
 function money(value) {
   return value.toLocaleString("pt-BR", {
@@ -313,6 +314,9 @@ function updateTotal() {
     total += item.product.price * quantity;
   });
 
+  const tuningValue = Number(tuningInput.value) || 0;
+  total += tuningValue * 0.2;
+
   if (partnerCheckbox.checked) {
     total -= total * (PARTNER_DISCOUNT_PERCENT / 100);
   }
@@ -344,11 +348,13 @@ function resetCalculator() {
   });
 
   partnerCheckbox.checked = false;
+  tuningInput.value = "";
   updateTotal();
 }
 
 partnerCheckbox.addEventListener("change", updateTotal);
 resetButton.addEventListener("click", resetCalculator);
+tuningInput.addEventListener("input", updateTotal);
 
 render();
 updateTotal();
