@@ -315,7 +315,7 @@ function updateTotal() {
   });
 
   const tuningValue = Number(tuningInput.value) || 0;
-  total += tuningValue * 0.2;
+  total += tuningValue * 1.2;
 
   if (partnerCheckbox.checked) {
     total -= total * (PARTNER_DISCOUNT_PERCENT / 100);
