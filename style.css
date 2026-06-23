@@ -305,6 +305,7 @@ input {
   font-size: 12px;
   font-weight: 700;
   line-height: 1.25;
+  white-space: nowrap;
 }
 
 .mensagem-parceria[hidden] {
