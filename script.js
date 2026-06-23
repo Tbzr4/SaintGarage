@@ -78,6 +78,7 @@ const totalElement = document.getElementById("valorTotal");
 const partnerCheckbox = document.getElementById("vendaParceria");
 const resetButton = document.getElementById("resetar");
 const tuningInput = document.getElementById("tunagemCustomizacao");
+const partnerMessage = document.getElementById("mensagemParceria");
 
 function money(value) {
   return value.toLocaleString("pt-BR", {
@@ -126,6 +127,7 @@ function render() {
   orderedCategories.forEach((category) => {
     const card = document.createElement("article");
     card.className = "categoria";
+    card.dataset.category = category.name;
 
     const title = document.createElement("h2");
     title.textContent = category.name;
@@ -140,7 +142,7 @@ function render() {
 
     category.products.forEach((product) => {
       const id = productId(category.name, product.name);
-      state.set(id, { checked: false, quantity: 0, stage: 0, product });
+      state.set(id, { checked: false, quantity: 0, stage: 0, categoryName: category.name, product });
 
       if (product.stages) {
         card.appendChild(makeStageRow(id, product));
@@ -299,9 +301,14 @@ function updateQuantity(row, quantity) {
 
 function updateTotal() {
   let total = 0;
+  const isPartnerSale = partnerCheckbox.checked;
 
   state.forEach((item) => {
     if (!item.checked) {
+      return;
+    }
+
+    if (isPartnerSale && item.categoryName !== "Venda") {
       return;
     }
 
@@ -311,17 +318,60 @@ function updateTotal() {
     }
 
     const quantity = item.product.multiple ? item.quantity : 1;
-    total += item.product.price * quantity;
+    const productTotal = item.product.price * quantity;
+    total += isPartnerSale && item.categoryName === "Venda"
+      ? productTotal * (1 - PARTNER_DISCOUNT_PERCENT / 100)
+      : productTotal;
   });
 
   const tuningValue = Number(tuningInput.value) || 0;
-  total += tuningValue * 1.2;
-
-  if (partnerCheckbox.checked) {
-    total -= total * (PARTNER_DISCOUNT_PERCENT / 100);
-  }
+  total += tuningValue * (isPartnerSale ? 1.15 : 1.2);
 
   totalElement.textContent = money(total);
+}
+
+function updatePartnerMode() {
+  const isPartnerSale = partnerCheckbox.checked;
+  partnerMessage.hidden = !isPartnerSale;
+
+  state.forEach((item) => {
+    if (!isPartnerSale || item.categoryName === "Venda") {
+      return;
+    }
+
+    item.checked = false;
+    item.quantity = 0;
+    item.stage = 0;
+  });
+
+  document.querySelectorAll(".categoria").forEach((card) => {
+    const isBlocked = isPartnerSale && card.dataset.category !== "Venda";
+    card.classList.toggle("categoria-bloqueada", isBlocked);
+
+    card.querySelectorAll("input, button").forEach((control) => {
+      control.disabled = isBlocked;
+    });
+
+    if (!isBlocked) {
+      return;
+    }
+
+    card.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+
+    card.querySelectorAll(".quantidade span").forEach((amount) => {
+      amount.textContent = "0";
+    });
+
+    card.querySelectorAll(".estagios button").forEach((button) => {
+      button.classList.remove("ativo");
+    });
+
+    card.querySelectorAll(".stage-price").forEach((price) => {
+      price.textContent = "Nenhum estágio";
+    });
+  });
 }
 
 function resetCalculator() {
@@ -349,12 +399,17 @@ function resetCalculator() {
 
   partnerCheckbox.checked = false;
   tuningInput.value = "";
+  updatePartnerMode();
   updateTotal();
 }
 
-partnerCheckbox.addEventListener("change", updateTotal);
+partnerCheckbox.addEventListener("change", () => {
+  updatePartnerMode();
+  updateTotal();
+});
 resetButton.addEventListener("click", resetCalculator);
 tuningInput.addEventListener("input", updateTotal);
 
 render();
+updatePartnerMode();
 updateTotal();

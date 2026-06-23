@@ -67,6 +67,20 @@ input {
   backdrop-filter: blur(3px);
 }
 
+.categoria-bloqueada {
+  opacity: 0.45;
+}
+
+.categoria-bloqueada h2::after {
+  content: " indisponível na parceria";
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: none;
+}
+
 .categoria h2 {
   margin: 0 0 14px;
   font-size: 23px;
@@ -283,6 +297,18 @@ input {
 .tunagem input:focus {
   border-color: rgba(255, 255, 255, 0.86);
   box-shadow: 0 0 0 2px rgba(142, 85, 255, 0.35);
+}
+
+.mensagem-parceria {
+  display: block;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.mensagem-parceria[hidden] {
+  display: none;
 }
 
 .resetar {
