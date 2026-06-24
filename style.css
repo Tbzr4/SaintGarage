@@ -193,10 +193,9 @@ input {
 }
 
 .total-linha {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 10px;
-  align-items: baseline;
+  align-items: end;
   justify-content: flex-end;
   font-size: 22px;
   font-weight: 800;
@@ -208,25 +207,41 @@ input {
   color: var(--branco);
 }
 
+.desconto-aplicado {
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-shadow: 0 0 10px rgba(142, 85, 255, 0.9);
+}
+
+.desconto-aplicado[hidden] {
+  display: none;
+}
+
 .token-box {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
+  align-items: center;
   font-size: 15px;
   font-weight: 800;
 }
 
 .token-box input {
-  width: min(100%, 260px);
+  width: 74px;
   height: 38px;
   border: 1px solid rgba(165, 105, 255, 0.72);
   border-radius: 7px;
-  background: rgba(0, 0, 0, 0.48);
+  background: #000000;
   color: var(--branco);
   padding: 0 10px;
   font-size: 15px;
   font-weight: 800;
   outline: none;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .token-box input:focus {
@@ -299,8 +314,8 @@ input {
 
 .botao-secundario {
   min-width: 112px;
-  background: rgba(0, 0, 0, 0.48);
-  box-shadow: none;
+  background: linear-gradient(180deg, var(--roxo), var(--roxo-forte));
+  box-shadow: 0 10px 22px rgba(93, 39, 184, 0.35);
 }
 
 .resetar:hover,

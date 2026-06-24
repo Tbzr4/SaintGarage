@@ -35,6 +35,7 @@ const resetButton = document.getElementById("resetar");
 const tuningInput = document.getElementById("tunagemCustomizacao");
 const tokenInput = document.getElementById("tokenParceiro");
 const tokenStatus = document.getElementById("tokenStatus");
+const discountMessage = document.getElementById("descontoAplicado");
 const manageButton = document.getElementById("gerenciar");
 const manageModal = document.getElementById("gerenciarModal");
 const closeManageButton = document.getElementById("fecharGerenciar");
@@ -221,8 +222,9 @@ function handleTokenInput() {
 
   if (!token) {
     activePartnerId = null;
-    tokenStatus.textContent = "Sem token aplicado";
+    tokenStatus.textContent = "";
     tokenStatus.className = "";
+    updateDiscountMessage();
     updateTotal();
     return;
   }
@@ -244,9 +246,23 @@ function handleTokenInput() {
   }
 
   activePartnerId = partner.id;
-  tokenStatus.textContent = partner.name;
-  tokenStatus.className = "token-valido";
+  tokenStatus.textContent = "";
+  tokenStatus.className = "";
+  updateDiscountMessage();
   updateTotal();
+}
+
+function updateDiscountMessage() {
+  const activePartner = getActivePartner();
+
+  if (!activePartner) {
+    discountMessage.hidden = true;
+    discountMessage.textContent = "";
+    return;
+  }
+
+  discountMessage.hidden = false;
+  discountMessage.textContent = `Desconto para ${activePartner.name} aplicado!`;
 }
 
 function updateTotal() {
@@ -291,8 +307,9 @@ function resetCalculator() {
 
   activePartnerId = null;
   tokenInput.value = "";
-  tokenStatus.textContent = "Sem token aplicado";
+  tokenStatus.textContent = "";
   tokenStatus.className = "";
+  updateDiscountMessage();
   tuningInput.value = "";
   updateTotal();
 }

@@ -18,8 +18,8 @@
       <div class="acoes-resumo">
         <label class="token-box">
           <span>Token</span>
-          <input id="tokenParceiro" type="text" placeholder="Digite o token" autocomplete="off" />
-          <small id="tokenStatus">Sem token aplicado</small>
+          <input id="tokenParceiro" type="text" maxlength="4" placeholder="TOKEN" autocomplete="off" />
+          <small id="tokenStatus"></small>
         </label>
 
         <div class="botoes-resumo">
@@ -34,6 +34,7 @@
       </label>
 
       <div class="total-linha">
+        <small id="descontoAplicado" class="desconto-aplicado" hidden></small>
         <span>Valor total:</span>
         <strong id="valorTotal">R$ 0,00</strong>
       </div>
