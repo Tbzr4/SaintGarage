@@ -16,20 +16,21 @@
 
     <footer class="resumo">
       <div class="acoes-resumo">
-        <label class="parceria">
-          <input id="vendaParceria" type="checkbox" />
-          <span>Venda para parceria</span>
+        <label class="token-box">
+          <span>Token</span>
+          <input id="tokenParceiro" type="text" placeholder="Digite o token" autocomplete="off" />
+          <small id="tokenStatus">Sem token aplicado</small>
         </label>
 
-        <button id="resetar" class="resetar" type="button">RESETAR</button>
+        <div class="botoes-resumo">
+          <button id="gerenciar" class="botao-secundario" type="button">GERENCIAR</button>
+          <button id="resetar" class="resetar" type="button">RESETAR</button>
+        </div>
       </div>
 
       <label class="tunagem">
         <span>Tunagem e Customização</span>
         <input id="tunagemCustomizacao" type="number" min="0" step="0.01" placeholder="R$ 0,00" />
-        <small id="mensagemParceria" class="mensagem-parceria" hidden>
-          favor preencher o campo acima para obter o valor correto
-        </small>
       </label>
 
       <div class="total-linha">
@@ -37,8 +38,45 @@
         <strong id="valorTotal">R$ 0,00</strong>
       </div>
     </footer>
+
+    <div id="gerenciarModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="gerenciarTitulo">
+      <div class="modal-painel">
+        <div class="modal-topo">
+          <h2 id="gerenciarTitulo">Gerenciar tokens</h2>
+          <button id="fecharGerenciar" class="botao-fechar" type="button">FECHAR</button>
+        </div>
+
+        <div class="tabela-wrap">
+          <table class="tabela-tokens">
+            <thead>
+              <tr>
+                <th>Estabelecimento</th>
+                <th>Usos</th>
+                <th>Token</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="listaTokens"></tbody>
+          </table>
+        </div>
+
+        <div class="novo-token">
+          <label>
+            <span>Novo estabelecimento</span>
+            <input id="novoEstabelecimento" type="text" placeholder="Nome" />
+          </label>
+          <label>
+            <span>Token</span>
+            <input id="novoToken" type="text" placeholder="Token" />
+          </label>
+          <button id="adicionarToken" class="botao-secundario" type="button">ADICIONAR</button>
+        </div>
+
+        <p id="gerenciarFeedback" class="gerenciar-feedback"></p>
+      </div>
+    </div>
   </main>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>

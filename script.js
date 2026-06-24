@@ -1,84 +1,85 @@
-const PARTNER_DISCOUNT_PERCENT = 15;
+const MANAGER_PASSWORD = "sg2026";
+const SALES_TOKEN_DISCOUNT_PERCENT = 15;
+const TUNING_MARKUP_PERCENT = 20;
+const TOKEN_TUNING_DISCOUNT_PERCENT = 5;
+const PARTNERS_STORAGE_KEY = "saintgarage-partners-v1";
 
-const categories = [
-  {
-    name: "Venda",
-    products: [
-      { name: "Reparo", price: 500 },
-      { name: "Kit Reparo", price: 1500, multiple: true, maxQuantity: 4 },
-      { name: "Pneu", price: 500, multiple: true, maxQuantity: 6 },
-      { name: "Chave Inglesa", price: 2000 },
-      { name: "Elevador Hidráulico", price: 1500 },
-      { name: "Baú de Teto Carbon", price: 40000 },
-      { name: "Baú de Teto Colorido", price: 50000 },
-      { name: "Rack de bicicleta", price: 60000 }
-    ]
-  },
-  {
-    name: "Custom",
-    products: [
-      { name: "Aerofólio", price: 1800 },
-      { name: "Para-choque dianteiro", price: 1800 },
-      { name: "Para-choque traseiro", price: 1800 },
-      { name: "Saias laterais", price: 1800 },
-      { name: "Escapamento", price: 1800 },
-      { name: "Teto", price: 1800 },
-      { name: "Capô", price: 1800 },
-      { name: "Grelha", price: 1800 },
-      { name: "Paralamas", price: 1800 },
-      { name: "Gaiola", price: 1800 },
-      { name: "Insufilm", price: 1800 },
-      { name: "Buzina", price: 1800 }
-    ]
-  },
-  {
-    name: "Roda",
-    products: [
-      { name: "Roda", price: 1800 },
-      { name: "Custom", price: 1800 },
-      { name: "Drift", price: 6000 },
-      { name: "Fumaça", price: 180 }
-    ]
-  },
-  {
-    name: "Pintura",
-    products: [
-      { name: "Metálico", price: 3000 },
-      { name: "Fosco", price: 3480 },
-      { name: "Metal", price: 3600 },
-      { name: "Cromado", price: 3360 },
-      { name: "Adesivo", price: 1800 },
-      { name: "Roda", price: 360 }
-    ]
-  },
-  {
-    name: "Luzes",
-    products: [
-      { name: "Neon", price: 1800 },
-      { name: "Xenon", price: 1800 }
-    ]
-  },
-  {
-    name: "Performance",
-    note: "(Número de estágios aplicados)",
-    products: [
-      { name: "Motor", stages: [24000, 48000, 72000, 96000, 120000] },
-      { name: "Freio", stages: [30000, 42000, 54000, 66000] },
-      { name: "Transmissão", stages: [24000, 48000, 72000, 96000] },
-      { name: "Suspensão", stages: [18000, 30000, 42000, 54000] },
-      { name: "Turbo", price: 24000 },
-      { name: "Blindagem", stages: [24000, 48000, 72000, 96000, 120000] }
-    ]
-  }
+const defaultPartners = [
+  { id: "beach-bar", name: "Beach Bar", token: "B7M2", uses: 0 },
+  { id: "saint-burguer", name: "Saint Burguer", token: "S4G9", uses: 0 },
+  { id: "gauderio-parrilla", name: "Gauderio Parrilla", token: "G3P8", uses: 0 },
+  { id: "policia-civil", name: "Polícia Civil", token: "P6C1", uses: 0 },
+  { id: "hospital", name: "Hospital", token: "H5P7", uses: 0 },
+  { id: "171", name: "171", token: "L2N5", uses: 0 },
+  { id: "marcone", name: "Marcone", token: "J8N4", uses: 0 }
+];
+
+const saleProducts = [
+  { name: "Reparo", price: 500 },
+  { name: "Kit Reparo", price: 1500, multiple: true, maxQuantity: 4 },
+  { name: "Pneu", price: 500, multiple: true, maxQuantity: 6 },
+  { name: "Chave Inglesa", price: 2000 },
+  { name: "Elevador Hidráulico", price: 1500 },
+  { name: "Baú de Teto Carbon", price: 40000 },
+  { name: "Baú de Teto Colorido", price: 50000 },
+  { name: "Rack de bicicleta", price: 60000 }
 ];
 
 const state = new Map();
+let partners = loadPartners();
+let activePartnerId = null;
+
 const categoriesElement = document.getElementById("categorias");
 const totalElement = document.getElementById("valorTotal");
-const partnerCheckbox = document.getElementById("vendaParceria");
 const resetButton = document.getElementById("resetar");
 const tuningInput = document.getElementById("tunagemCustomizacao");
-const partnerMessage = document.getElementById("mensagemParceria");
+const tokenInput = document.getElementById("tokenParceiro");
+const tokenStatus = document.getElementById("tokenStatus");
+const manageButton = document.getElementById("gerenciar");
+const manageModal = document.getElementById("gerenciarModal");
+const closeManageButton = document.getElementById("fecharGerenciar");
+const tokenList = document.getElementById("listaTokens");
+const newPartnerInput = document.getElementById("novoEstabelecimento");
+const newTokenInput = document.getElementById("novoToken");
+const addTokenButton = document.getElementById("adicionarToken");
+const manageFeedback = document.getElementById("gerenciarFeedback");
+
+function loadPartners() {
+  const savedPartners = localStorage.getItem(PARTNERS_STORAGE_KEY);
+
+  if (!savedPartners) {
+    const initialPartners = defaultPartners.map((partner) => ({ ...partner }));
+    localStorage.setItem(PARTNERS_STORAGE_KEY, JSON.stringify(initialPartners));
+    return initialPartners;
+  }
+
+  try {
+    const parsedPartners = JSON.parse(savedPartners);
+    if (!Array.isArray(parsedPartners) || parsedPartners.length === 0) {
+      const initialPartners = defaultPartners.map((partner) => ({ ...partner }));
+      localStorage.setItem(PARTNERS_STORAGE_KEY, JSON.stringify(initialPartners));
+      return initialPartners;
+    }
+
+    defaultPartners.forEach((defaultPartner) => {
+      const alreadyExists = parsedPartners.some((partner) => partner.id === defaultPartner.id);
+      if (!alreadyExists) {
+        parsedPartners.push({ ...defaultPartner });
+      }
+    });
+
+    localStorage.setItem(PARTNERS_STORAGE_KEY, JSON.stringify(parsedPartners));
+    return parsedPartners;
+  } catch {
+    const initialPartners = defaultPartners.map((partner) => ({ ...partner }));
+    localStorage.setItem(PARTNERS_STORAGE_KEY, JSON.stringify(initialPartners));
+    return initialPartners;
+  }
+}
+
+function savePartners() {
+  localStorage.setItem(PARTNERS_STORAGE_KEY, JSON.stringify(partners));
+}
 
 function money(value) {
   return value.toLocaleString("pt-BR", {
@@ -87,73 +88,36 @@ function money(value) {
   });
 }
 
-function productId(categoryName, productName) {
-  return `${categoryName}-${productName}`
+function normalizeToken(token) {
+  return token.trim().toLowerCase();
+}
+
+function productId(productName) {
+  return productName
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-");
 }
 
-function render() {
+function renderSales() {
   categoriesElement.innerHTML = "";
   state.clear();
 
-  const columns = [0, 1, 2].map(() => {
-    const column = document.createElement("div");
-    column.className = "coluna-categoria";
-    categoriesElement.appendChild(column);
-    return column;
+  const card = document.createElement("article");
+  card.className = "categoria venda-centralizada";
+
+  const title = document.createElement("h2");
+  title.textContent = "Venda";
+  card.appendChild(title);
+
+  saleProducts.forEach((product) => {
+    const id = productId(product.name);
+    state.set(id, { checked: false, quantity: 0, product });
+    card.appendChild(makeProductRow(id, product));
   });
 
-  const layout = {
-    "Venda": 0,
-    "Roda": 0,
-    "Custom": 1,
-    "Luzes": 1,
-    "Pintura": 2,
-    "Performance": 2
-  };
-
-  const orderedCategories = [
-    "Venda",
-    "Roda",
-    "Custom",
-    "Luzes",
-    "Pintura",
-    "Performance"
-  ].map((name) => categories.find((category) => category.name === name));
-
-  orderedCategories.forEach((category) => {
-    const card = document.createElement("article");
-    card.className = "categoria";
-    card.dataset.category = category.name;
-
-    const title = document.createElement("h2");
-    title.textContent = category.name;
-    card.appendChild(title);
-
-    if (category.note) {
-      const note = document.createElement("p");
-      note.className = "categoria-nota";
-      note.textContent = category.note;
-      card.appendChild(note);
-    }
-
-    category.products.forEach((product) => {
-      const id = productId(category.name, product.name);
-      state.set(id, { checked: false, quantity: 0, stage: 0, categoryName: category.name, product });
-
-      if (product.stages) {
-        card.appendChild(makeStageRow(id, product));
-      } else {
-        card.appendChild(makeProductRow(id, product));
-      }
-    });
-
-    const columnIndex = layout[category.name] || 0;
-    columns[columnIndex].appendChild(card);
-  });
+  categoriesElement.appendChild(card);
 }
 
 function makeProductRow(id, product) {
@@ -210,44 +174,6 @@ function makeProductRow(id, product) {
   return row;
 }
 
-function makeStageRow(id, product) {
-  const row = document.createElement("div");
-  row.className = "produto produto-estagio";
-
-  const spacer = document.createElement("span");
-  spacer.className = "stage-spacer";
-
-  const info = document.createElement("div");
-  info.className = "produto-info";
-
-  const name = document.createElement("span");
-  name.className = "produto-nome";
-  name.textContent = product.name;
-
-  const price = document.createElement("span");
-  price.className = "produto-preco stage-price";
-  price.textContent = "Nenhum estágio";
-
-  info.append(name, price);
-
-  const controls = document.createElement("div");
-  controls.className = "estagios";
-
-  product.stages.forEach((stagePrice, index) => {
-    const stageNumber = index + 1;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = String(stageNumber);
-    button.title = `${product.name} estágio ${stageNumber}: ${money(stagePrice)}`;
-    button.addEventListener("click", () => selectStage(id, row, stageNumber));
-    controls.appendChild(button);
-  });
-
-  row.append(spacer, info, controls);
-
-  return row;
-}
-
 function makeIconButton(label, imagePath) {
   const button = document.createElement("button");
   button.type = "button";
@@ -274,24 +200,6 @@ function changeQuantity(id, row, checkbox, direction) {
   updateTotal();
 }
 
-function selectStage(id, row, stageNumber) {
-  const item = state.get(id);
-  item.stage = item.stage === stageNumber ? 0 : stageNumber;
-  item.checked = item.stage > 0;
-
-  const buttons = row.querySelectorAll(".estagios button");
-  buttons.forEach((button, index) => {
-    button.classList.toggle("ativo", index + 1 === item.stage);
-  });
-
-  const price = row.querySelector(".stage-price");
-  price.textContent = item.stage
-    ? money(item.product.stages[item.stage - 1])
-    : "Nenhum estágio";
-
-  updateTotal();
-}
-
 function updateQuantity(row, quantity) {
   const amount = row.querySelector(".quantidade span");
   if (amount) {
@@ -299,86 +207,78 @@ function updateQuantity(row, quantity) {
   }
 }
 
+function findPartnerByToken(token) {
+  const normalizedToken = normalizeToken(token);
+  return partners.find((partner) => normalizeToken(partner.token) === normalizedToken);
+}
+
+function getActivePartner() {
+  return partners.find((partner) => partner.id === activePartnerId) || null;
+}
+
+function handleTokenInput() {
+  const token = tokenInput.value.trim();
+
+  if (!token) {
+    activePartnerId = null;
+    tokenStatus.textContent = "Sem token aplicado";
+    tokenStatus.className = "";
+    updateTotal();
+    return;
+  }
+
+  const partner = findPartnerByToken(token);
+
+  if (!partner) {
+    activePartnerId = null;
+    tokenStatus.textContent = "Token inválido";
+    tokenStatus.className = "token-invalido";
+    updateTotal();
+    return;
+  }
+
+  if (activePartnerId !== partner.id) {
+    partner.uses += 1;
+    savePartners();
+    renderPartnerManager();
+  }
+
+  activePartnerId = partner.id;
+  tokenStatus.textContent = partner.name;
+  tokenStatus.className = "token-valido";
+  updateTotal();
+}
+
 function updateTotal() {
-  let total = 0;
-  const isPartnerSale = partnerCheckbox.checked;
+  const activePartner = getActivePartner();
+  let salesTotal = 0;
 
   state.forEach((item) => {
     if (!item.checked) {
       return;
     }
 
-    if (isPartnerSale && item.categoryName !== "Venda") {
-      return;
-    }
-
-    if (item.product.stages) {
-      total += item.product.stages[item.stage - 1] || 0;
-      return;
-    }
-
     const quantity = item.product.multiple ? item.quantity : 1;
-    const productTotal = item.product.price * quantity;
-    total += isPartnerSale && item.categoryName === "Venda"
-      ? productTotal * (1 - PARTNER_DISCOUNT_PERCENT / 100)
-      : productTotal;
+    salesTotal += item.product.price * quantity;
   });
+
+  if (activePartner) {
+    salesTotal *= 1 - SALES_TOKEN_DISCOUNT_PERCENT / 100;
+  }
 
   const tuningValue = Number(tuningInput.value) || 0;
-  total += tuningValue * (isPartnerSale ? 1.15 : 1.2);
+  const tuningWithMarkup = tuningValue * (1 + TUNING_MARKUP_PERCENT / 100);
+  const tuningTotal = activePartner
+    ? tuningWithMarkup * (1 - TOKEN_TUNING_DISCOUNT_PERCENT / 100)
+    : tuningWithMarkup;
 
-  totalElement.textContent = money(total);
-}
-
-function updatePartnerMode() {
-  const isPartnerSale = partnerCheckbox.checked;
-  partnerMessage.hidden = !isPartnerSale;
-
-  state.forEach((item) => {
-    if (!isPartnerSale || item.categoryName === "Venda") {
-      return;
-    }
-
-    item.checked = false;
-    item.quantity = 0;
-    item.stage = 0;
-  });
-
-  document.querySelectorAll(".categoria").forEach((card) => {
-    const isBlocked = isPartnerSale && card.dataset.category !== "Venda";
-    card.classList.toggle("categoria-bloqueada", isBlocked);
-
-    card.querySelectorAll("input, button").forEach((control) => {
-      control.disabled = isBlocked;
-    });
-
-    if (!isBlocked) {
-      return;
-    }
-
-    card.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-      checkbox.checked = false;
-    });
-
-    card.querySelectorAll(".quantidade span").forEach((amount) => {
-      amount.textContent = "0";
-    });
-
-    card.querySelectorAll(".estagios button").forEach((button) => {
-      button.classList.remove("ativo");
-    });
-
-    card.querySelectorAll(".stage-price").forEach((price) => {
-      price.textContent = "Nenhum estágio";
-    });
-  });
+  totalElement.textContent = money(salesTotal + tuningTotal);
 }
 
 function resetCalculator() {
   state.forEach((item) => {
     item.checked = false;
     item.quantity = 0;
-    item.stage = 0;
   });
 
   document.querySelectorAll('.produto input[type="checkbox"]').forEach((checkbox) => {
@@ -389,27 +289,139 @@ function resetCalculator() {
     amount.textContent = "0";
   });
 
-  document.querySelectorAll(".estagios button").forEach((button) => {
-    button.classList.remove("ativo");
-  });
-
-  document.querySelectorAll(".stage-price").forEach((price) => {
-    price.textContent = "Nenhum estágio";
-  });
-
-  partnerCheckbox.checked = false;
+  activePartnerId = null;
+  tokenInput.value = "";
+  tokenStatus.textContent = "Sem token aplicado";
+  tokenStatus.className = "";
   tuningInput.value = "";
-  updatePartnerMode();
   updateTotal();
 }
 
-partnerCheckbox.addEventListener("change", () => {
-  updatePartnerMode();
-  updateTotal();
-});
+function openManager() {
+  const password = prompt("Digite a senha para gerenciar:");
+
+  if (password !== MANAGER_PASSWORD) {
+    alert("Senha incorreta.");
+    return;
+  }
+
+  renderPartnerManager();
+  manageFeedback.textContent = "";
+  manageModal.hidden = false;
+}
+
+function closeManager() {
+  manageModal.hidden = true;
+}
+
+function renderPartnerManager() {
+  tokenList.innerHTML = "";
+
+  if (partners.length === 0) {
+    const emptyRow = document.createElement("tr");
+    const emptyCell = document.createElement("td");
+    emptyCell.colSpan = 4;
+    emptyCell.textContent = "Nenhum estabelecimento cadastrado.";
+    emptyCell.className = "tabela-vazia";
+    emptyRow.appendChild(emptyCell);
+    tokenList.appendChild(emptyRow);
+    return;
+  }
+
+  partners.forEach((partner) => {
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = partner.name;
+
+    const usesCell = document.createElement("td");
+    usesCell.textContent = String(partner.uses || 0);
+
+    const tokenCell = document.createElement("td");
+    const tokenField = document.createElement("input");
+    tokenField.type = "text";
+    tokenField.value = partner.token;
+    tokenCell.appendChild(tokenField);
+
+    const actionCell = document.createElement("td");
+    const saveButton = document.createElement("button");
+    saveButton.type = "button";
+    saveButton.className = "botao-secundario";
+    saveButton.textContent = "SALVAR";
+    saveButton.addEventListener("click", () => {
+      updatePartnerToken(partner.id, tokenField.value);
+    });
+    actionCell.appendChild(saveButton);
+
+    row.append(nameCell, usesCell, tokenCell, actionCell);
+    tokenList.appendChild(row);
+  });
+}
+
+function updatePartnerToken(partnerId, token) {
+  const partner = partners.find((item) => item.id === partnerId);
+  const cleanToken = token.trim();
+
+  if (!partner || !cleanToken) {
+    manageFeedback.textContent = "Preencha um token válido.";
+    return;
+  }
+
+  const tokenAlreadyExists = partners.some((item) => {
+    return item.id !== partnerId && normalizeToken(item.token) === normalizeToken(cleanToken);
+  });
+
+  if (tokenAlreadyExists) {
+    manageFeedback.textContent = "Esse token já está sendo usado.";
+    return;
+  }
+
+  partner.token = cleanToken;
+  savePartners();
+  manageFeedback.textContent = "Token atualizado.";
+  handleTokenInput();
+  renderPartnerManager();
+}
+
+function addPartner() {
+  const name = newPartnerInput.value.trim();
+  const token = newTokenInput.value.trim();
+
+  if (!name || !token) {
+    manageFeedback.textContent = "Preencha o nome e o token.";
+    return;
+  }
+
+  if (partners.some((partner) => normalizeToken(partner.token) === normalizeToken(token))) {
+    manageFeedback.textContent = "Esse token já está sendo usado.";
+    return;
+  }
+
+  partners.push({
+    id: `partner-${Date.now()}`,
+    name,
+    token,
+    uses: 0
+  });
+
+  newPartnerInput.value = "";
+  newTokenInput.value = "";
+  savePartners();
+  renderPartnerManager();
+  manageFeedback.textContent = "Estabelecimento adicionado.";
+}
+
 resetButton.addEventListener("click", resetCalculator);
 tuningInput.addEventListener("input", updateTotal);
+tokenInput.addEventListener("input", handleTokenInput);
+manageButton.addEventListener("click", openManager);
+closeManageButton.addEventListener("click", closeManager);
+addTokenButton.addEventListener("click", addPartner);
+manageModal.addEventListener("click", (event) => {
+  if (event.target === manageModal) {
+    closeManager();
+  }
+});
 
-render();
-updatePartnerMode();
+renderSales();
 updateTotal();
